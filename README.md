@@ -1,9 +1,9 @@
-## flocker-docker: portable volumes using just the docker cli
+## flocker-docker: the flocker plugin for docker
+### portable volumes using just the docker cli
+
 *or: how I learned to love running stateful docker containers and stop worrying where the data is*
 
 ![flying books to illustrate portable volumes](resources/flying_books.jpg)
-
-(Portable "volumes", hee hee.)
 
 ## What's the problem?
 
@@ -14,9 +14,9 @@ However, when you attach a volume to a Docker container, the machine it's runnin
 
 You should be able to run a stateful container with a given volume on any host in your cluster, and the platform should handle moving data around as necessary.
 
-## What is the flocker plugin for docker (`flocker-docker`)?
+## What is `flocker-docker`?
 
-`flocker-docker` allows you to use the regular `docker` CLI commands to create or move flocker volumes, automatically moving volumes around between hosts in the cluster as-needed.
+`flocker-docker` is a docker volumes plugin which allows you to use the regular `docker` CLI commands to create or move flocker volumes, automatically moving volumes around between hosts in the cluster as-needed.
 
 ## How does it work?
 
