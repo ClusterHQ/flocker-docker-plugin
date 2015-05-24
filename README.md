@@ -1,4 +1,4 @@
-## powerstrip-flocker: portable volumes using just the docker cli
+## flocker-docker: portable volumes using just the docker cli
 *or: how I learned to love running stateful docker containers and stop worrying where the data is*
 
 ![flying books to illustrate portable volumes](resources/flying_books.jpg)
