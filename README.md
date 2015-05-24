@@ -46,7 +46,7 @@ We are working on adding support for Docker volumes plugins to common orchestrat
 
 ## Composition
 
-We are also working on assing support to composition tools.
+We are also working on adding support to composition tools.
 
 ## Is it ready yet?
 
