@@ -317,7 +317,7 @@ def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker")):
         # it for auth against the control service
         cert_data = certificates_path.child("cluster.crt").getContent()
         auth_data = certificates_path.child("node.key").getContent()
-        agent_config = yaml.load(config.path)
+        agent_config = yaml.load(config.open())
         client_certificate = ssl.PrivateCertificate.loadPEM(auth_data)
         authority = ssl.Certificate.loadPEM(cert_data)
         options = optionsForClientTLS(
