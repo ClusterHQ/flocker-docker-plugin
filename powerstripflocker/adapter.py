@@ -312,7 +312,7 @@ def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker")):
     config = certificates_path.child("agent.yml")
     node_key = certificates_path.child("node.key")
     cluster_crt = certificates_path.child("cluster.crt")
-    if (config.exists() and node_key.exists() and cluster_crt.exists()):
+    if config.exists() and node_key.exists() and cluster_crt.exists():
         # we are installed on a flocker node with a certificate, try to reuse
         # it for auth against the control service
         cert_data = certificates_path.child("cluster.crt").getContent()
