@@ -20,6 +20,5 @@ def getAdapter():
 
 application = service.Application("Powerstrip Flocker Adapter")
 
-# XXX need to bind-mount /usr/share/docker/plugins into this container.
 adapterServer = internet.UNIXServer("/usr/share/docker/plugins/flocker.sock", getAdapter())
 adapterServer.setServiceParent(application)

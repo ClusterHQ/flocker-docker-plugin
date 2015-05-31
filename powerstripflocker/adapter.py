@@ -6,16 +6,20 @@ See:
 * https://github.com/clusterhq/flocker
 """
 
-from twisted.internet import reactor, defer
+from twisted.internet import reactor, defer, ssl
 from twisted.web import server, resource
 from twisted.python import log
 import json
 import pprint
 import os
+import yaml
 
 from twisted.web.client import Agent
 from treq.client import HTTPClient
 import treq
+from twisted.python.filepath import FilePath
+
+from twisted.internet.ssl import optionsForClientTLS
 
 class HandshakeResource(resource.Resource):
     """
@@ -64,8 +68,7 @@ class PathResource(resource.Resource):
     machine, this is an error.
     """
     def __init__(self, *args, **kw):
-        self._agent = Agent(reactor) # no connectionpool
-        self.client = HTTPClient(self._agent)
+        self.client = get_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
@@ -129,8 +132,7 @@ class MountResource(resource.Resource):
     isLeaf = True
 
     def __init__(self, *args, **kw):
-        self._agent = Agent(reactor) # no connectionpool
-        self.client = HTTPClient(self._agent)
+        self.client = get_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
@@ -293,3 +295,34 @@ def loop_until(predicate):
     d.addCallback(loop)
     return d
 
+def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker")):
+    """
+    Create a ``treq``-API object that implements the REST API TLS
+    authentication.
+
+    That is, validating the control service as well as presenting a
+    certificate to the control service for authentication.
+
+    :param reactor: The reactor to use.
+    :param FilePath certificates_path: Directory where certificates and
+        private key can be found.
+
+    :return: ``treq`` compatible object.
+    """
+    config = certificates_path.child("agent.yml")
+    node_key = certificates_path.child("node.key")
+    cluster_crt = certificates_path.child("cluster.crt")
+    if (config.exists() and node_key.exists() and cluster_crt.exists()):
+        # we are installed on a flocker node with a certificate, try to reuse
+        # it for auth against the control service
+        cert_data = certificates_path.child("cluster.crt").getContent()
+        auth_data = certificates_path.child("node.key").getContent()
+        agent_config = yaml.load(config.path)
+        client_certificate = ssl.PrivateCertificate.loadPEM(auth_data)
+        authority = ssl.Certificate.loadPEM(cert_data)
+        options = optionsForClientTLS(
+                agent_config["control-service"]["hostname"],
+                authority, client_certificate)
+        return HTTPClient(Agent(reactor, contextFactory=options))
+    else:
+        return HTTPClient(Agent(reactor))
