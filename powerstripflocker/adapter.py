@@ -295,6 +295,7 @@ def loop_until(predicate):
     d.addCallback(loop)
     return d
 
+
 def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker")):
     """
     Create a ``treq``-API object that implements the REST API TLS
