@@ -289,3 +289,30 @@ def loop_until(predicate):
         return result
     d.addCallback(loop)
     return d
+
+def get_tls_client():
+    """Return a txflocker.get_client() with values slurped from the envrionment.
+
+    :return: ``treq`` compatible object.
+    """
+
+    # the fields we can override from env vars
+    fields = [
+        'certificates_path',
+        'user_certificate_filename',
+        'user_key_filename',
+        'cluster_certificate_filename',
+        'target_hostname'
+    ]
+
+    # sparsly populated with values if present
+    values = {}
+
+    for field in fields:
+        # we upper-case the field name 
+        # certificates_path -> CERTIFICATES_PATH
+        env = os.environ.get(field.upper())
+        if env is not None:
+            values[field] = env
+
+    return txflocker.get_client(**values)
