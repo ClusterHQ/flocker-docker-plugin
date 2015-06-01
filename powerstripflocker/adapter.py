@@ -62,7 +62,7 @@ class PathResource(resource.Resource):
     machine, this is an error.
     """
     def __init__(self, *args, **kw):
-        self.client = txflocker.get_client()
+        self.client = get_tls_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
@@ -127,7 +127,7 @@ class MountResource(resource.Resource):
     isLeaf = True
 
     def __init__(self, *args, **kw):
-        self.client = txflocker.get_client()
+        self.client = get_tls_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
