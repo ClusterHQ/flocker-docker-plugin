@@ -14,7 +14,7 @@ import json
 import os
 import pprint
 import treq
-import txflocker
+import txflocker.client
 
 class HandshakeResource(resource.Resource):
     """
@@ -306,7 +306,7 @@ def get_tls_client():
         'target_hostname'
     ]
 
-    # sparsly populated with values if present
+    # holds the values that are present
     values = {}
 
     for field in fields:
@@ -318,4 +318,4 @@ def get_tls_client():
             if field == "certificates_path":
                 values[field] = FilePath(values[field])
 
-    return txflocker.get_client(**values)
+    return txflocker.client.get_client()
