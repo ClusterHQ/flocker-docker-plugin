@@ -39,10 +39,6 @@ def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker"),
             and target_hostname is not None):
         # we are installed on a flocker node with a certificate, try to reuse
         # it for auth against the control service
-        print ("TLS context: "
-                "user_crt: %s, cluster_crt: %s, user_key: %s, target_hostname: %s" % (
-                    user_crt, cluster_crt, user_key, target_hostname))
-
         cert_data = cluster_crt.getContent()
         auth_data = user_crt.getContent() + user_key.getContent()
 
