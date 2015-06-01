@@ -9,6 +9,7 @@ See:
 from twisted.internet import reactor, defer
 from twisted.python import log
 from twisted.web import server, resource
+from twisted.python.filepath import FilePath
 import json
 import os
 import pprint
@@ -314,5 +315,7 @@ def get_tls_client():
         env = os.environ.get(field.upper())
         if env is not None:
             values[field] = env
+            if field == "certificates_path":
+                values[field] = FilePath(values[field])
 
     return txflocker.get_client(**values)
