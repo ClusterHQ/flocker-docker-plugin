@@ -6,20 +6,13 @@ See:
 * https://github.com/clusterhq/flocker
 """
 
-from twisted.internet import reactor, defer, ssl
-from twisted.web import server, resource
+from twisted.internet import reactor, defer
 from twisted.python import log
+from twisted.web import server, resource
 import json
-import pprint
 import os
-import yaml
-
-from twisted.web.client import Agent
-from treq.client import HTTPClient
+import pprint
 import treq
-from twisted.python.filepath import FilePath
-
-from twisted.internet.ssl import optionsForClientTLS
 import txflocker
 
 class HandshakeResource(resource.Resource):
@@ -83,13 +76,14 @@ class PathResource(resource.Resource):
         def get_dataset(datasets):
             dataset_id = None
             # 1. find the flocker dataset_id of the named volume
-            # 2. look up the path of that volume in the datasets current state
             for dataset in datasets:
                 if dataset["metadata"]["name"] == data["Name"]:
                     dataset_id = dataset["dataset_id"]
             d = self.client.get(self.base_url + "/state/datasets")
             d.addCallback(treq.json_content)
             def get_path(datasets, dataset_id):
+                # 2. look up the path of that volume in the datasets current
+                # state
                 if dataset_id is None:
                     path = None
                 else:

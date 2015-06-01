@@ -11,7 +11,9 @@ from twisted.web.client import Agent
 
 import yaml
 
-def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker")):
+def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker"),
+        private_key_filename="node.key",
+        cluster_certificate_filename="cluster.crt", target_hostname=None):
     """
     Create a ``treq``-API object that implements the REST API TLS
     authentication.
@@ -25,20 +27,28 @@ def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker")):
 
     :return: ``treq`` compatible object.
     """
-    config = certificates_path.child("agent.yml")
-    node_key = certificates_path.child("node.key")
-    cluster_crt = certificates_path.child("cluster.crt")
-    if config.exists() and node_key.exists() and cluster_crt.exists():
+    if target_hostname is not None:
+        config = certificates_path.child("agent.yml")
+        if config.exists():
+            agent_config = yaml.load(config.open())
+            target_hostname = agent_config["control-service"]["hostname"]
+    node_key = certificates_path.child(private_key_filename)
+    cluster_crt = certificates_path.child(cluster_certificate_filename)
+    if (node_key.exists() and cluster_crt.exists()
+            and target_hostname is not None):
         # we are installed on a flocker node with a certificate, try to reuse
         # it for auth against the control service
-        cert_data = certificates_path.child("cluster.crt").getContent()
-        auth_data = certificates_path.child("node.key").getContent()
-        agent_config = yaml.load(config.open())
+        cert_data = certificates_path.child(
+                cluster_certificate_filename).getContent()
+        auth_data = certificates_path.child(
+                private_key_filename).getContent()
         client_certificate = ssl.PrivateCertificate.loadPEM(auth_data)
         authority = ssl.Certificate.loadPEM(cert_data)
         options = optionsForClientTLS(
-                agent_config["control-service"]["hostname"],
+                target_hostname,
                 authority, client_certificate)
         return HTTPClient(Agent(reactor, contextFactory=options))
     else:
-        return HTTPClient(Agent(reactor))
+        raise Exception("Not enough information to construct TLS context: "
+                "node_key: %s, cluster_crt: %s, target_hostname: %s" % (
+                    node_key, cluster_crt, target_hostname))
