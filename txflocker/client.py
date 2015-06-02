@@ -3,6 +3,7 @@ A collection of utilities for using the flocker REST API.
 """
 
 from treq.client import HTTPClient
+from OpenSSL import SSL
 
 from twisted.internet import reactor, ssl
 from twisted.internet.ssl import optionsForClientTLS
@@ -32,9 +33,11 @@ def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker"),
         if config.exists():
             agent_config = yaml.load(config.open())
             target_hostname = agent_config["control-service"]["hostname"]
+
     user_crt = certificates_path.child(user_certificate_filename)
     user_key = certificates_path.child(user_key_filename)
     cluster_crt = certificates_path.child(cluster_certificate_filename)
+
     if (user_crt.exists() and user_key.exists() and cluster_crt.exists()
             and target_hostname is not None):
         # we are installed on a flocker node with a certificate, try to reuse
@@ -45,10 +48,12 @@ def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker"),
         authority = ssl.Certificate.loadPEM(cert_data)
         client_certificate = ssl.PrivateCertificate.loadPEM(auth_data)
 
-        options = optionsForClientTLS(
-                unicode(target_hostname),
-                authority, client_certificate)
-        return HTTPClient(Agent(reactor, contextFactory=options))
+        class ContextFactory(object):
+            def getContext(self, hostname, port):
+                context = client_certificate.options(authority).getContext()
+                return context
+
+        return HTTPClient(Agent(reactor, contextFactory=ContextFactory()))
     else:
         raise Exception("Not enough information to construct TLS context: "
                 "user_crt: %s, cluster_crt: %s, user_key: %s, target_hostname: %s" % (
