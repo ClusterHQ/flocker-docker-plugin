@@ -3,17 +3,15 @@ A collection of utilities for using the flocker REST API.
 """
 
 from treq.client import HTTPClient
-from OpenSSL import SSL
 
 from twisted.internet import reactor, ssl
-from twisted.internet.ssl import optionsForClientTLS
 from twisted.python.filepath import FilePath
 from twisted.web.client import Agent
 
 import yaml
 
 def get_client(reactor=reactor, certificates_path=FilePath("/etc/flocker"),
-        user_certificate_filename="node.crt", user_key_filename="node.key",
+        user_certificate_filename="plugin.crt", user_key_filename="plugin.key",
         cluster_certificate_filename="cluster.crt", target_hostname=None):
     """
     Create a ``treq``-API object that implements the REST API TLS

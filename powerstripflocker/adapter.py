@@ -13,7 +13,7 @@ import json
 import os
 import pprint
 import treq
-import txflocker
+from txflocker.client import get_client
 
 class HandshakeResource(resource.Resource):
     """
@@ -62,7 +62,7 @@ class PathResource(resource.Resource):
     machine, this is an error.
     """
     def __init__(self, *args, **kw):
-        self.client = txflocker.get_client()
+        self.client = get_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
@@ -127,7 +127,7 @@ class MountResource(resource.Resource):
     isLeaf = True
 
     def __init__(self, *args, **kw):
-        self.client = txflocker.get_client()
+        self.client = get_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
