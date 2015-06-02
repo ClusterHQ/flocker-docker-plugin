@@ -318,4 +318,4 @@ def get_tls_client():
             if field == "certificates_path":
                 values[field] = FilePath(values[field])
 
-    return txflocker.client.get_client()
+    return txflocker.client.get_client(**values)
