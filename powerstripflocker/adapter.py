@@ -15,6 +15,8 @@ import pprint
 import treq
 from txflocker.client import get_client
 
+DEFAULT_VOLUME_SIZE = 107374182400
+
 class HandshakeResource(resource.Resource):
     """
     A hook for initial handshake.  Say that we're a volume plugin.
@@ -251,7 +253,8 @@ class MountResource(resource.Resource):
                     else:
                         # if a dataset doesn't exist at all, create it on this server.
                         d = self.client.post(self.base_url + "/configuration/datasets",
-                            json.dumps({"primary": self.host_uuid, "metadata": {"name": fs}}),
+                            json.dumps({"primary": self.host_uuid, "metadata": {"name": fs},
+                                "maximum_size": DEFAULT_VOLUME_SIZE }),
                             headers={'Content-Type': ['application/json']})
                         d.addCallback(treq.json_content)
                         d.addCallback(wait_until_volume_in_place, fs=fs)
