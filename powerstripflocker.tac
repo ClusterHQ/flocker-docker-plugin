@@ -1,5 +1,6 @@
 # Copyright ClusterHQ Inc. See LICENSE file for details.
 
+import os
 from twisted.web import server, resource
 from twisted.application import service, internet
 
@@ -20,5 +21,8 @@ def getAdapter():
 
 application = service.Application("Powerstrip Flocker Adapter")
 
-adapterServer = internet.UNIXServer("/usr/share/docker/plugins/flocker.sock", getAdapter())
+DOCKER_PLUGINS_FOLDER = os.environ.get("DOCKER_PLUGINS_FOLDER",
+    "/usr/share/docker/plugins") + "/flocker.sock"
+
+adapterServer = internet.UNIXServer(DOCKER_PLUGINS_FOLDER, getAdapter())
 adapterServer.setServiceParent(application)
