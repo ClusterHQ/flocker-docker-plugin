@@ -21,10 +21,8 @@ def getAdapter():
 
 application = service.Application("Powerstrip Flocker Adapter")
 
-DOCKER_PLUGINS_FOLDER = os.environ.get("DOCKER_PLUGINS_FOLDER")
-
-if DOCKER_PLUGINS_FOLDER is None:
-    DOCKER_PLUGINS_FOLDER = "/usr/share/docker/plugins/flocker.sock"
+DOCKER_PLUGINS_FOLDER = os.environ.get("DOCKER_PLUGINS_FOLDER",
+    "/usr/share/docker/plugins") + "/flocker.sock"
 
 adapterServer = internet.UNIXServer(DOCKER_PLUGINS_FOLDER, getAdapter())
 adapterServer.setServiceParent(application)
