@@ -7,15 +7,15 @@ See:
 """
 
 from twisted.internet import reactor, defer
-from twisted.web import server, resource
 from twisted.python import log
+from twisted.web import server, resource
 import json
-import pprint
 import os
-
-from twisted.web.client import Agent
-from treq.client import HTTPClient
+import pprint
 import treq
+from txflocker.client import get_client
+
+DEFAULT_VOLUME_SIZE = 107374182400
 
 class HandshakeResource(resource.Resource):
     """
@@ -64,8 +64,7 @@ class PathResource(resource.Resource):
     machine, this is an error.
     """
     def __init__(self, *args, **kw):
-        self._agent = Agent(reactor) # no connectionpool
-        self.client = HTTPClient(self._agent)
+        self.client = get_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
@@ -79,13 +78,14 @@ class PathResource(resource.Resource):
         def get_dataset(datasets):
             dataset_id = None
             # 1. find the flocker dataset_id of the named volume
-            # 2. look up the path of that volume in the datasets current state
             for dataset in datasets:
                 if dataset["metadata"]["name"] == data["Name"]:
                     dataset_id = dataset["dataset_id"]
             d = self.client.get(self.base_url + "/state/datasets")
             d.addCallback(treq.json_content)
             def get_path(datasets, dataset_id):
+                # 2. look up the path of that volume in the datasets current
+                # state
                 if dataset_id is None:
                     path = None
                 else:
@@ -129,8 +129,7 @@ class MountResource(resource.Resource):
     isLeaf = True
 
     def __init__(self, *args, **kw):
-        self._agent = Agent(reactor) # no connectionpool
-        self.client = HTTPClient(self._agent)
+        self.client = get_client()
         return resource.Resource.__init__(self, *args, **kw)
 
     def render_POST(self, request):
@@ -185,17 +184,35 @@ class MountResource(resource.Resource):
             d.addCallback(lambda dataset: (fs, dataset))
             return d
 
-        d = self.client.get(self.base_url + "/state/nodes")
-        d.addCallback(treq.json_content)
-        def find_my_uuid(nodes):
-            for node in nodes:
-                if node["host"] == self.ip:
-                    self.host_uuid = node["uuid"]
-                    break
-            return self.client.get(self.base_url + "/configuration/datasets")
-        d.addCallback(find_my_uuid)
+        def find_my_uuid():
+            """
+            Ensure there are some nodes before carrying on
+            """
+            d = self.client.get(self.base_url + "/state/nodes")
+            d.addCallback(treq.json_content)
+            def check_nodes(nodes):
+                print "Nodes returned from /state/nodes"
+                pprint.pprint(nodes)
+                for node in nodes:
+                    if node["host"] == self.ip:
+                        return node["uuid"]
+                return False
+            d.addCallback(check_nodes)
+            return d
 
+        d = loop_until(find_my_uuid)
+
+        def uuid_loaded(host_uuid):
+            """
+            Called once the uuid has been loaded from GET /state/nodes
+            It continues the deffered chain by calling GET /configuration/datasets
+            """
+            self.host_uuid = host_uuid
+            return self.client.get(self.base_url + "/configuration/datasets")
+
+        d.addCallback(uuid_loaded)
         d.addCallback(treq.json_content)
+
         def got_dataset_configuration(configured_datasets):
             # form a mapping from names onto dataset objects
             configured_dataset_mapping = {}
@@ -236,7 +253,8 @@ class MountResource(resource.Resource):
                     else:
                         # if a dataset doesn't exist at all, create it on this server.
                         d = self.client.post(self.base_url + "/configuration/datasets",
-                            json.dumps({"primary": self.host_uuid, "metadata": {"name": fs}}),
+                            json.dumps({"primary": self.host_uuid, "metadata": {"name": fs},
+                                "maximum_size": DEFAULT_VOLUME_SIZE }),
                             headers={'Content-Type': ['application/json']})
                         d.addCallback(treq.json_content)
                         d.addCallback(wait_until_volume_in_place, fs=fs)
@@ -292,4 +310,3 @@ def loop_until(predicate):
         return result
     d.addCallback(loop)
     return d
-
