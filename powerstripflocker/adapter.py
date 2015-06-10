@@ -96,6 +96,10 @@ class PathResource(resource.Resource):
                          Err=None,
                     )))
                 else:
+                    print "Bailing out because we couldn't find a path,",
+                    print "passing docker an error:"
+                    print "    unable to find %s" % (data["Name"],)
+
                     request.write(json.dumps(dict(
                          Mountpoint="",
                          Err="unable to find %s" % (data["Name"],),
