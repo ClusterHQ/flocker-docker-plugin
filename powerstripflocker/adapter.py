@@ -168,13 +168,10 @@ class MountResource(resource.Resource):
                     host that this means the move is complete.
                     """
                     print "Got", self.ip, self.host_uuid, "datasets:", datasets
-                    matching_datasets = []
                     for dataset in datasets:
-                        if dataset["dataset_id"] == dataset_id:
-                            matching_datasets.append(dataset)
-                    if len(matching_datasets) == 1:
-                        if matching_datasets[0]["primary"] == self.host_uuid:
-                            return matching_datasets[0]
+                        if (dataset["dataset_id"] == dataset_id and
+                                dataset["primary"] == self.host_uuid):
+                            return dataset
                     return False
                 d.addCallback(check_dataset_exists)
                 return d
