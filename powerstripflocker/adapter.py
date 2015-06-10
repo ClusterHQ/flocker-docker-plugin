@@ -15,6 +15,8 @@ import pprint
 import treq
 from txflocker.client import get_client
 
+DEFAULT_VOLUME_SIZE = 107374182400
+
 class HandshakeResource(resource.Resource):
     """
     A hook for initial handshake.  Say that we're a volume plugin.
@@ -180,17 +182,35 @@ class MountResource(resource.Resource):
             d.addCallback(lambda dataset: (fs, dataset))
             return d
 
-        d = self.client.get(self.base_url + "/state/nodes")
-        d.addCallback(treq.json_content)
-        def find_my_uuid(nodes):
-            for node in nodes:
-                if node["host"] == self.ip:
-                    self.host_uuid = node["uuid"]
-                    break
-            return self.client.get(self.base_url + "/configuration/datasets")
-        d.addCallback(find_my_uuid)
+        def find_my_uuid():
+            """
+            Ensure there are some nodes before carrying on
+            """
+            d = self.client.get(self.base_url + "/state/nodes")
+            d.addCallback(treq.json_content)
+            def check_nodes(nodes):
+                print "Nodes returned from /state/nodes"
+                pprint.pprint(nodes)
+                for node in nodes:
+                    if node["host"] == self.ip:
+                        return node["uuid"]
+                return False
+            d.addCallback(check_nodes)
+            return d
 
+        d = loop_until(find_my_uuid)
+
+        def uuid_loaded(host_uuid):
+            """
+            Called once the uuid has been loaded from GET /state/nodes
+            It continues the deffered chain by calling GET /configuration/datasets
+            """
+            self.host_uuid = host_uuid
+            return self.client.get(self.base_url + "/configuration/datasets")
+
+        d.addCallback(uuid_loaded)
         d.addCallback(treq.json_content)
+
         def got_dataset_configuration(configured_datasets):
             # form a mapping from names onto dataset objects
             configured_dataset_mapping = {}
@@ -231,7 +251,8 @@ class MountResource(resource.Resource):
                     else:
                         # if a dataset doesn't exist at all, create it on this server.
                         d = self.client.post(self.base_url + "/configuration/datasets",
-                            json.dumps({"primary": self.host_uuid, "metadata": {"name": fs}}),
+                            json.dumps({"primary": self.host_uuid, "metadata": {"name": fs},
+                                "maximum_size": DEFAULT_VOLUME_SIZE }),
                             headers={'Content-Type': ['application/json']})
                         d.addCallback(treq.json_content)
                         d.addCallback(wait_until_volume_in_place, fs=fs)
