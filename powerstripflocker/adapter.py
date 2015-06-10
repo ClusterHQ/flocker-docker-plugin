@@ -84,12 +84,10 @@ class PathResource(resource.Resource):
             def get_path(datasets, dataset_id):
                 # 2. look up the path of that volume in the datasets current
                 # state
-                if dataset_id is None:
-                    path = None
-                else:
-                    for dataset in datasets:
-                        if dataset["dataset_id"] == dataset_id:
-                            path = dataset["path"]
+                path = None
+                for dataset in datasets:
+                    if dataset["dataset_id"] == dataset_id:
+                        path = dataset["path"]
                 if path is not None:
                     request.write(json.dumps(dict(
                          Mountpoint=path,
