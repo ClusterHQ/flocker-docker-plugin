@@ -102,7 +102,8 @@ class PathResource(resource.Resource):
 
                     request.write(json.dumps(dict(
                          Mountpoint="",
-                         Err="unable to find %s" % (data["Name"],),
+                         #Err="unable to find %s" % (data["Name"],),
+                         Err=None,
                     )))
                 request.finish()
             d.addCallback(get_path, dataset_id=dataset_id)
