@@ -167,7 +167,8 @@ class MountResource(resource.Resource):
                     therefore that when it settles down to only show it on one
                     host that this means the move is complete.
                     """
-                    print "Got", self.ip, self.host_uuid, "datasets:", datasets
+                    print "Looking for volume", dataset_id, "on myself", self.ip, self.host_uuid
+                    print "Got state:", pprint.pformat(datasets)
                     for dataset in datasets:
                         if (dataset["dataset_id"] == dataset_id and
                                 dataset["primary"] == self.host_uuid):
