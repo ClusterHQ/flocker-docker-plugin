@@ -173,10 +173,13 @@ class MountResource(resource.Resource):
                     """
                     print "Looking for volume", dataset_id, "on myself", self.ip, self.host_uuid
                     print "Got state:", pprint.pformat(datasets)
+                    matching_datasets = []
                     for dataset in datasets:
-                        if (dataset["dataset_id"] == dataset_id and
-                                dataset["primary"] == self.host_uuid):
-                            return dataset
+                        if dataset["dataset_id"] == dataset_id:
+                            matching_datasets.append(dataset)
+                    if len(matching_datasets) == 1:
+                        if matching_datasets[0]["primary"] == self.host_uuid:
+                            return matching_datasets[0]
                     return False
                 d.addCallback(check_dataset_exists)
                 return d
