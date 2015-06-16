@@ -220,7 +220,7 @@ class MountResource(resource.Resource):
             # form a mapping from names onto dataset objects
             configured_dataset_mapping = {}
             for dataset in configured_datasets:
-                if dataset["metadata"].get("name"):
+                if dataset["metadata"].get("name") and not dataset["deleted"]:
                     configured_dataset_mapping[dataset["metadata"].get("name")] = dataset
 
             # iterate over the datasets we were asked to create by the docker client
@@ -236,7 +236,7 @@ class MountResource(resource.Resource):
                     #    raise Exception("Not allowed flocker filesystems more than one level deep")
                     old_binds.append((fs, remainder))
                     # if a dataset exists, and is (configured to be) in the right place, we're cool.
-                    if fs in configured_dataset_mapping and not configured_dataset_mapping[fs]["deleted"]:
+                    if fs in configured_dataset_mapping:
                         dataset = configured_dataset_mapping[fs]
                         if dataset["primary"] == self.host_uuid:
                             # check / wait for the state to match the desired
