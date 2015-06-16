@@ -50,5 +50,5 @@ env.key_filename.append("/root/.ssh/id_rsa_flocker")
 
 if __name__ == '__main__':
     from admin.acceptance import main
-    main(sys.argv[1:] + ["powerstripflocker.test.test_acceptance"],
+    main(sys.argv[1:] + ["flockerdockerplugin.test.test_acceptance"],
             top_level=TOPLEVEL, base_path=BASEPATH)
