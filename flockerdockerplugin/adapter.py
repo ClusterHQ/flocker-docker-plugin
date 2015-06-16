@@ -215,8 +215,8 @@ class MountResource(resource.Resource):
                     # if "/" in fs:
                     #    raise Exception("Not allowed flocker filesystems more than one level deep")
                     old_binds.append((fs, remainder))
-                    # if a dataset exists, and is in the right place, we're cool.
-                    if fs in configured_dataset_mapping:
+                    # if a dataset exists, and is (configured to be) in the right place, we're cool.
+                    if fs in configured_dataset_mapping and not configured_dataset_mapping[fs]["deleted"]:
                         dataset = configured_dataset_mapping[fs]
                         if dataset["primary"] == self.host_uuid:
                             # check / wait for the state to match the desired
@@ -234,7 +234,7 @@ class MountResource(resource.Resource):
                             d.addCallback(wait_until_volume_in_place, fs=fs)
                             fs_create_deferreds.append(d)
                     else:
-                        # if a dataset doesn't exist at all, create it on this server.
+                        # if a dataset doesn't exist at all (or is marked as deleted), create it on this server.
                         d = self.client.post(self.base_url + "/configuration/datasets",
                             json.dumps({"primary": self.host_uuid, "metadata": {"name": fs}}),
                             headers={'Content-Type': ['application/json']})
