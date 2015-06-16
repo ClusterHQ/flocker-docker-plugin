@@ -13,7 +13,7 @@ Run these tests first time with:
 $ vagrant box add \
       http://build.clusterhq.com/results/vagrant/master/flocker-tutorial.json
 $ admin/run-powerstrip-acceptance-tests \
-      --keep --distribution=fedora-20 powerstripflocker.test.test_acceptance
+      --keep --distribution=fedora-20 flockerdockerplugin.test.test_acceptance
 
 After that, you can do quick test runs with the following.
 If you haven't changed the server-side component of flocker-plugin (ie, if
@@ -248,7 +248,7 @@ class PowerstripFlockerTests(TestCase):
                        + "FLOCKER_CONTROL_SERVICE_BASE_URL=%s" % (self.cluster.base_url,)
                        + " MY_NETWORK_IDENTITY=%s" % (ip,)
                        + " MY_HOST_UUID=%s" % (host_uuid,)
-                       + " twistd -noy powerstripflocker.tac")
+                       + " twistd -noy flockerdockerplugin.tac")
                 print "CMD >>", cmd
                 self.plugins[ip] = remote_service_for_test(self, ip,
                     ["bash", "-c", cmd])

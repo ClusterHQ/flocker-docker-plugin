@@ -5,7 +5,7 @@ set -x -e
 # $ vagrant box add \
 #       http://build.clusterhq.com/results/vagrant/master/flocker-tutorial.json
 # $ admin/run-powerstrip-acceptance-tests \
-#       --keep --distribution=fedora-20 powerstripflocker.test.test_acceptance
+#       --keep --distribution=fedora-20 flockerdockerplugin.test.test_acceptance
 # This will set up some VMs, which will take a while.
 
 # Then you can run the following to do fast development cycles (replace
@@ -15,7 +15,7 @@ set -x -e
 # Run ./quick.sh --no-build to make it even quicker (if you've only changed the
 # acceptance test and not the actual adapter).
 
-# This should match up with DOCKER_PULL_REPO in powerstripflocker/test/test_acceptance.py
+# This should match up with DOCKER_PULL_REPO in flockerdockerplugin/test/test_acceptance.py
 DOCKER_PULL_REPO="lmarsden"
 
 # This is a docker binary which gets scp'd onto the nodes...
@@ -57,5 +57,5 @@ fi
 export FLOCKER_ACCEPTANCE_NODES="${NODE1}:${NODE2}"
 export FLOCKER_ACCEPTANCE_CONTROL_NODE=${NODE1}
 export FLOCKER_ACCEPTANCE_AGENT_NODES=${FLOCKER_ACCEPTANCE_NODES}
-trial ${2:-powerstripflocker.test.test_acceptance}
+trial ${2:-flockerdockerplugin.test.test_acceptance}
 
