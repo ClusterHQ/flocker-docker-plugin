@@ -1,0 +1,5 @@
+#!python
+import os, distutils.spawn, pkg_resources
+twistd = distutils.spawn.find_executable("twistd")
+tac = pkg_resources.resource_filename("flockerdockerplugin", "flockerdockerplugin.tac")
+os.execl(twistd, "twistd", "-noy", tac)

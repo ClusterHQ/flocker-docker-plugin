@@ -1,47 +1,35 @@
 # Copyright ClusterHQ Limited. See LICENSE file for details.
 
 """
-Setup Powerstrip.
+Start the Flocker Docker Plugin
 """
-import os
-from setuptools import setup, find_packages
-
+from setuptools import setup
 
 with open("README.md") as readme:
     description = readme.read()
 
-setup(
-    # This is the human-targetted name of the software being packaged.
-    name="Powerstrip Flocker Adapter",
-    # This is a string giving the version of the software being packaged.  For
-    # simplicity it should be something boring like X.Y.Z.
-    version="0.1",
-    # This identifies the creators of this software.  This is left symbolic for
-    # ease of maintenance.
-    author="ClusterHQ Labs",
-    # This is contact information for the authors.
-    author_email="labs@clusterhq.com",
-    # Here is a website where more information about the software is available.
-    url="https://clusterhq.com/",
-
-    # A short identifier for the license under which the project is released.
-    license="Apache License, Version 2.0",
-
-    # Some details about what Flocker is.  Synchronized with the README.rst to
-    # keep it up to date more easily.
-    long_description=description,
-
-    install_requires=[
-        # XXX these are in Dockerfile to speed up the build
-        #"Twisted == 14.0.0",
-        #"PyYAML == 3.10",
-        #"treq == 0.2.1",
-        #"service_identity",
-        #"pycrypto",
-        #"pyrsistent",
+    setup(
+        name="FlockerDockerPlugin",
+        version="0.1",
+        author="ClusterHQ Labs",
+        author_email="labs@clusterhq.com",
+        url="https://clusterhq.com/",
+        long_description=description,
+        license="Apache License, Version 2.0",
+        classifiers=[
+            "License :: OSI Approved :: Apache Software License",
         ],
-    # Some "trove classifiers" which are relevant.
-    classifiers=[
-        "License :: OSI Approved :: Apache Software License",
+        install_requires=[
+            "pyasn1>=0.1",
+            "Twisted>=14",
+            "PyYAML>=3",
+            "treq>=14",
         ],
+        packages=[
+            "flockerdockerplugin",
+            "txflocker",
+        ],
+        scripts=[
+            "bin/flocker-docker-plugin",
+        ]
     )
