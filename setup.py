@@ -29,6 +29,9 @@ with open("README.md") as readme:
             "flockerdockerplugin",
             "txflocker",
         ],
+        package_data={
+            "flockerdockerplugin": ["*.tac"],
+        },
         scripts=[
             "bin/flocker-docker-plugin",
         ]
