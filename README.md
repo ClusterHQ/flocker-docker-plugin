@@ -4,4 +4,4 @@ The Flocker Docker plugin is a [Docker volumes plugin](https://github.com/docker
 
 ## Documentation
 
-Please refer to [the Flocker Docker plugin docs](https://docs.clusterhq.com/en/latest/labs/).
+Please refer to [the Flocker Docker plugin docs](https://docs.clusterhq.com/en/latest/labs/docker-plugin.html).
