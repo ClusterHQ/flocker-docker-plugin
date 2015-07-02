@@ -79,7 +79,8 @@ class PathResource(resource.Resource):
             dataset_id = None
             # 1. find the flocker dataset_id of the named volume
             for dataset in datasets:
-                if dataset["metadata"]["name"] == data["Name"]:
+                if ("name" in dataset["metadata"] and
+                        dataset["metadata"]["name"] == data["Name"]):
                     dataset_id = dataset["dataset_id"]
             d = self.client.get(self.base_url + "/state/datasets")
             d.addCallback(treq.json_content)
