@@ -109,6 +109,12 @@ class PathResource(resource.Resource):
             d.addCallback(get_path, dataset_id=dataset_id)
             return d
         d.addCallback(get_dataset)
+        def handle_failure(failure):
+            request.setHeader("Content-Type", "application/json")
+            request.write(json.dumps(dict(Mountpoint="", Err=str(failure))))
+            request.finish()
+            return failure
+        d.addErrback(handle_failure)
         return server.NOT_DONE_YET
 
 class UnmountResource(resource.Resource):
@@ -288,6 +294,12 @@ class MountResource(resource.Resource):
             d.addCallback(got_created_and_moved_datasets)
             return d
         d.addCallback(got_dataset_configuration)
+        def handle_failure(failure):
+            request.setHeader("Content-Type", "application/json")
+            request.write(json.dumps(dict(Mountpoint="", Err=str(failure))))
+            request.finish()
+            return failure
+        d.addErrback(handle_failure)
         d.addErrback(log.err, 'while processing configured datasets')
         return server.NOT_DONE_YET
 
