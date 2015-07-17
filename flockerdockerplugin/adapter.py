@@ -179,7 +179,8 @@ class MountResource(resource.Resource):
                         if dataset["dataset_id"] == dataset_id:
                             matching_datasets.append(dataset)
                     if len(matching_datasets) == 1:
-                        if matching_datasets[0]["primary"] == self.host_uuid:
+                        if ("primary" in matching_datasets[0] and
+                                matching_datasets[0]["primary"] == self.host_uuid):
                             return matching_datasets[0]
                     return False
                 d.addCallback(check_dataset_exists)
