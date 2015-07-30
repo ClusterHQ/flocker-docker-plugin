@@ -10,7 +10,7 @@ with open("README.md") as readme:
 
     setup(
         name="FlockerDockerPlugin",
-        version="0.2",
+        version="0.3",
         author="ClusterHQ Labs",
         author_email="labs@clusterhq.com",
         url="https://clusterhq.com/",
