@@ -40,7 +40,7 @@ socket file if it is found
 def prepareSocketPath(socketPath):
     dirName = os.path.dirname(socketPath)
     if not os.path.exists(dirName):
-        os.makedirs(dirName)
+        os.makedirs(dirName, 0755)
 
 """
 Create a UNIX socket on the given path and mount the 
