@@ -37,7 +37,7 @@ def getAdapter():
 Ensure the directory for the socket exists and remove the existing
 socket file if it is found
 """
-def prepareSocketPath(path):
+def prepareSocketPath(socketPath):
     dirName = os.path.dirname(socketPath)
     if not os.path.exists(dirName):
         os.makedirs(dirName)
