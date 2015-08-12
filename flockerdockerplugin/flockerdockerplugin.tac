@@ -41,6 +41,8 @@ def prepareSocketPath(socketPath):
     dirName = os.path.dirname(socketPath)
     if not os.path.exists(dirName):
         os.makedirs(dirName, 0755)
+    if os.path.exists(socketPath):
+        os.remove(socketPath)
 
 """
 Create a UNIX socket on the given path and mount the 
