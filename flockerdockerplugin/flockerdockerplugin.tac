@@ -34,6 +34,15 @@ def getAdapter():
     return site
 
 """
+Ensure the directory for the socket exists and remove the existing
+socket file if it is found
+"""
+def prepareSocketPath(path):
+    dirName = os.path.dirname(socketPath)
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+
+"""
 Create a UNIX socket on the given path and mount the 
 given adapter on the socket
 make the service parent of the server the given application
@@ -49,11 +58,9 @@ application = service.Application("Flocker Docker Plugin")
 adapter = getAdapter()
 
 """
-Loop over each socketPath - create the folder and then mount the adapter
+Loop over each socketPath and mount the adapter
 on the socket for that path
 """
 for socketPath in socketPaths:
-    dirName = os.path.dirname(socketPath)
-    if not os.path.exists(dirName):
-        os.makedirs(dirName)
+    prepareSocketPath(socketPath)
     mountAdapter(socketPath, adapter, application)
