@@ -15,7 +15,7 @@ import pprint
 import treq
 from txflocker.client import get_client
 
-DEFAULT_VOLUME_SIZE = os.environ.get("FLOCKER_MAX_SIZE", 107374182400)
+DEFAULT_VOLUME_SIZE = os.getenv("FLOCKER_MAX_SIZE", 107374182400)
 
 class HandshakeResource(resource.Resource):
     """
